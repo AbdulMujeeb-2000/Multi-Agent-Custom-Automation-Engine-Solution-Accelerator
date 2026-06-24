@@ -76,6 +76,14 @@ PLAN RULES:
 - Steps are HIGH-LEVEL task assignments — one step per agent. Do NOT prescribe
   sub-tasks, parameters, or data retrieval. Agents discover their own processes.
 """ + clarification_policy + """
+MANDATORY AGENT INCLUSION (CRITICAL):
+- Your plan MUST include EVERY agent from the team list above. No exceptions.
+- Even if an agent's role seems redundant or overlapping with your own capabilities,
+  you MUST include it in the plan. Each agent has unique tools and domain knowledge
+  that only they can access.
+- Do NOT skip an agent because its description sounds similar to another agent.
+- The plan must assign at least one step to EVERY available agent.
+
 OUTPUT FORMAT (CRITICAL — use EXACTLY this JSON structure, nothing else):
 ```json
 [
