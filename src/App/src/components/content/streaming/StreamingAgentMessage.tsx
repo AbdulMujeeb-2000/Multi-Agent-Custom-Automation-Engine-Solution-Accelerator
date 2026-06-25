@@ -6,7 +6,7 @@ import rehypePrism from "rehype-prism";
 import { Body1, Tag, makeStyles, tokens, Button } from "@fluentui/react-components";
 import { TaskService } from "@/store";
 import { PersonRegular, ArrowDownloadRegular } from "@fluentui/react-icons";
-import { getAgentIcon, getAgentDisplayName } from '@/utils/agentIconUtils';
+import { getAgentIcon, getAgentDisplayName, normalizeAgentNamesInText } from '@/utils/agentIconUtils';
 import { formatJsonInText } from '@/utils/jsonFormatter';
 
 interface StreamingAgentMessageProps {
@@ -149,6 +149,18 @@ const renderAgentMessages = (
   // Filter out messages with empty content
   const validMessages = agentMessages.filter(msg => msg.content?.trim());
   if (!validMessages.length) return null;
+
+  // Known internal agent names from the plan/team, used to normalize raw
+  // names (e.g. "HRHelperAgent") that appear inside streamed body text so
+  // they match the formatted agent header (e.g. "HR Helper Agent").
+  const knownAgentNames: string[] = (
+    planApprovalRequest?.steps ??
+    planData?.mplan?.steps ??
+    planData?.steps ??
+    []
+  )
+    .map((step: any) => step?.agent)
+    .filter(Boolean);
 
   return (
     <>
@@ -307,7 +319,7 @@ const renderAgentMessages = (
                       )
                     }}
                 >
-                  {formatJsonInText(TaskService.cleanHRAgent(msg.content) || "")}
+                  {formatJsonInText(normalizeAgentNamesInText(TaskService.cleanHRAgent(msg.content) || "", knownAgentNames))}
                 </ReactMarkdown>
               </div>
             </div>

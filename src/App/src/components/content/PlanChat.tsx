@@ -84,7 +84,7 @@ const PlanChat: React.FC<SimplifiedPlanChatProps> = ({
 
         {/* Plan response with all information */}
         {renderPlanResponse(planApprovalRequest, handleApprovePlan, handleRejectPlan, processingApproval, showApprovalButtons)}
-        {renderAgentMessages(agentMessages, undefined, undefined, finalResultRef)}
+        {renderAgentMessages(agentMessages, planData, planApprovalRequest, finalResultRef)}
 
         {showProcessingPlanSpinner && renderPlanExecutionMessage()}
         {/* Streaming plan updates — hidden while an approval prompt is pending so
@@ -94,6 +94,9 @@ const PlanChat: React.FC<SimplifiedPlanChatProps> = ({
           <StreamingBufferMessage
             streamingMessageBuffer={streamingMessageBuffer}
             isStreaming={true}
+            knownAgentNames={(planApprovalRequest?.steps ?? planData?.mplan?.steps ?? [])
+              .map((step: any) => step?.agent)
+              .filter(Boolean)}
           />
         )}
       </div>

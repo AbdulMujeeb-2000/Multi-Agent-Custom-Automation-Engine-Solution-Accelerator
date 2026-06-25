@@ -7,16 +7,19 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypePrism from "rehype-prism";
 import { formatJsonInText } from "@/utils/jsonFormatter";
+import { normalizeAgentNamesInText } from "@/utils/agentIconUtils";
  
 interface StreamingBufferMessageProps {
     streamingMessageBuffer: string;
     isStreaming?: boolean;
+    knownAgentNames?: string[];
 }
  
 // Convert to a proper React component instead of a function
 const StreamingBufferMessage: React.FC<StreamingBufferMessageProps> = ({
     streamingMessageBuffer,
-    isStreaming = false
+    isStreaming = false,
+    knownAgentNames = []
 }) => {
     const [isExpanded, setIsExpanded] = useState<boolean>(false);
     const [shouldFade, setShouldFade] = useState<boolean>(false);
@@ -43,7 +46,7 @@ const StreamingBufferMessage: React.FC<StreamingBufferMessageProps> = ({
  
     if (!streamingMessageBuffer || streamingMessageBuffer.trim() === "") return null;
  
-    const formattedBuffer = formatJsonInText(streamingMessageBuffer);
+    const formattedBuffer = formatJsonInText(normalizeAgentNamesInText(streamingMessageBuffer, knownAgentNames));
  
     return (
         <div style={{

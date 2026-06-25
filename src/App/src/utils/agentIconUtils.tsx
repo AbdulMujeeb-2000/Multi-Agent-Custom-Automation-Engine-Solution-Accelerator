@@ -353,6 +353,38 @@ export const getAgentDisplayNameWithSuffix = (agentName: string): string => {
 };
 
 /**
+ * Replace raw internal agent names (e.g. "HRHelperAgent") inside free-form
+ * text (thinking/reasoning stream, plan JSON) with their display form
+ * (e.g. "HR Helper Agent"), so agent labels and body text stay consistent.
+ *
+ * Only names present in `agentNames` are rewritten, so unrelated text is
+ * never mangled. Internal names are left untouched everywhere the framework
+ * needs them (prompts, plan parsing) — this is a display-layer transform only.
+ *
+ * @param text       The streamed text to normalize.
+ * @param agentNames Known internal agent names from the plan/team
+ *                   (e.g. planData.steps[].agent).
+ */
+export const normalizeAgentNamesInText = (
+    text: string,
+    agentNames: string[]
+): string => {
+    if (!text || !agentNames?.length) return text;
+
+    // Longest first so "HRHelperAgent" wins over any shorter prefix.
+    const unique = Array.from(new Set(agentNames.filter(Boolean)))
+        .sort((a, b) => b.length - a.length);
+
+    let out = text;
+    for (const raw of unique) {
+        const display = getAgentDisplayNameWithSuffix(raw);
+        const escaped = raw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        out = out.replace(new RegExp(`\\b${escaped}\\b`, 'g'), display);
+    }
+    return out;
+};
+
+/**
  * Get agent icon with custom styling override
  */
 /**
